@@ -1,0 +1,98 @@
+#include <iostream>
+#include <bits/stdc++.h>
+#define ll long long
+using namespace std;
+
+
+using namespace std;
+class Distjointset
+{
+    vector <int> ranks,parent;
+public:
+    vector <int> sizes;
+    Distjointset(int n){
+    ranks.resize(n+1,0);
+    parent.resize(n+1);
+    sizes.resize(n,1);
+    for(int i=0;i<n;i++)
+        parent[i]=i;
+    }
+    int findup(int node)
+     {
+         if (node==parent[node])
+            return node;
+         return parent[node]=findup(parent[node]);
+     }
+     void union_by_rank(int u,int v)
+     {
+         int ulp_u=findup(u);
+         int ulp_v=findup(v);
+         if (ulp_v==ulp_u) return ;
+         if (sizes[ulp_u]<sizes[ulp_v])
+         {
+             parent[ulp_u]=ulp_v;
+             sizes[ulp_v]+=sizes[ulp_u];
+
+         }
+
+         else
+         {
+             parent[ulp_v]=ulp_u;
+             sizes[ulp_u]+=sizes[ulp_v];
+         }
+     }
+};
+
+double dist(pair<int,int> x,pair<int,int> y)
+{
+    int dx=x.first -y.first;
+    int dy=x.second - y.second;
+    return sqrt(dx*dx + dy*dy);
+}
+int main()
+{
+    ios::sync_with_stdio(0);
+   int test;
+   cin>>test;
+   while(test -- )
+   {
+      int n,m;
+      cin>>n>>m;
+      vector < pair<int,int> > axes(m);
+      for(int i=0;i<m;i++)
+      {
+          int x,y;
+          cin>>x>>y;
+          axes[i]={x,y};
+      }
+      vector <vector <double> > edges ;
+    for(int i=0;i<m;i++)
+    {
+        for(int j=i+1;j<m;j++)
+        {
+            double wt=dist(axes[i],axes[j]);
+            edges.push_back({wt,i,j});
+
+        }
+    }
+
+    sort(edges.begin(),edges.end());
+    Distjointset ds(m);
+    vector <double> v;
+    for(auto it : edges)
+    {
+        int x=it[1];
+        int y=it[2];
+        double wt=it[0];
+        if (ds.findup(x)!=ds.findup(y))
+        {
+            ds.union_by_rank(x,y);
+            v.push_back(wt);
+        }
+    }
+
+   cout << fixed << setprecision(2) << v[v.size() - n] << endl;
+   }
+
+    return 0;
+}
